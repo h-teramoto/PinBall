@@ -25,6 +25,32 @@ public class FripperController : MonoBehaviour {
     }
 
 
+    //発展課題：同じfingerIdを持つTouchが離れたかどうかの監視をする
+    private IEnumerator TouchEnded(int fingerId)
+    {
+        while (true)
+        {
+            //タッチがあった場合
+            if (Input.touchCount > 0)
+            {
+                //タッチ箇所分処理する
+                foreach (Touch touch in Input.touches)
+                {
+                    //タッチが離されてかつfingerIdがマッチした場合
+                    if (fingerId == touch.fingerId && touch.phase == TouchPhase.Ended)
+                    {
+                        //Flipperを下げる
+                        SetAngle(this.defaultAngle);
+                        yield break;
+                    }
+
+                }
+            }
+
+            yield return null;
+        }
+    }
+
     //発展課題：スマートフォンでも動かせるようにマルチタッチに対応
     private IEnumerator InputTouch()
     {
@@ -45,13 +71,11 @@ public class FripperController : MonoBehaviour {
                         {
                             //Flipperを上げる
                             SetAngle(this.flickAngle);
+
+                            //Touchから取得したfingerIdを使用してタッチが離れたかどうか監視
+                            StartCoroutine("TouchEnded", touch.fingerId);
                         }
-                        //タッチが離れた場合
-                        else if (touch.phase == TouchPhase.Ended)
-                        {
-                            //Flipperを下げる
-                            SetAngle(this.defaultAngle);
-                        }
+
                     }
                 }
             }
